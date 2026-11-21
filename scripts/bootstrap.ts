@@ -9,7 +9,13 @@ import { setupBase, createFirstDirector } from "@/server/setup";
 import { closeDb } from "@/db";
 
 (async () => {
-  await runMigrations(process.env.DATABASE_URL!);
+  const url = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  if (!url) {
+    // e.g. the very first Vercel deploy, before the Neon database is attached: build the site, set up the DB on the next deploy.
+    console.warn("No DATABASE_URL yet: skipping database setup. Attach the database and redeploy.");
+    return;
+  }
+  await runMigrations(url);
   await setupBase();
   const email = process.env.BOOTSTRAP_DIRECTOR_EMAIL, pw = process.env.BOOTSTRAP_DIRECTOR_PASSWORD;
   if (email && pw) {

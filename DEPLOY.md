@@ -19,7 +19,7 @@ deploy it creates the default roles, the ISSS name and logo, and the first Direc
    | `BOOTSTRAP_DIRECTOR_PASSWORD` | a strong **temporary** password (10+ characters, letters and numbers) |
    | `BOOTSTRAP_DIRECTOR_NAME` | the Director's full name |
    | `SCHOOL_NAME` | `IBN Salahudeen Science School (ISSS)` |
-3. Click **Deploy**. The first build fails because there is no database yet. That's expected.
+3. Click **Deploy**. The site builds, but it can't work until the database is attached in the next step.
 4. In the project: **Storage → Create Database → Neon (Postgres)**, choose the free plan and region
    **Europe (Frankfurt)**, then connect it to the project for all environments. This adds `DATABASE_URL` automatically.
 5. **Deployments → ⋯ → Redeploy.** The build now sets up the database and the site goes live at

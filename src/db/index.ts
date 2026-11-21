@@ -18,8 +18,8 @@ const g = globalThis as unknown as { __sfmsPool?: Pool; __sfmsDb?: DB };
 
 function init(): DB {
   if (!g.__sfmsDb) {
-    const url = process.env.DATABASE_URL;
-    if (!url) throw new Error("DATABASE_URL is not set (see .env.example)");
+    const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+    if (!url) throw new Error("DATABASE_URL is not set. Attach the database (see DEPLOY.md) and redeploy.");
     // Serverless (Vercel) runs many small instances: keep each pool tiny and use the provider's pooled URL.
     g.__sfmsPool = new Pool({ connectionString: url, max: process.env.VERCEL ? 3 : 10, idleTimeoutMillis: 10_000 });
     g.__sfmsDb = drizzle(g.__sfmsPool, { schema });
