@@ -1,0 +1,1 @@
+ALTER TABLE "school_settings" ALTER COLUMN "school_name" SET DEFAULT 'IBN Salahudeen Science School (ISSS)';
