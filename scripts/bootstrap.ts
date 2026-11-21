@@ -24,4 +24,16 @@ import { closeDb } from "@/db";
   } else console.log("BOOTSTRAP_DIRECTOR_EMAIL / BOOTSTRAP_DIRECTOR_PASSWORD not set — skipped creating the first Director.");
   console.log("Setup complete.");
   await closeDb();
-})().catch(async (e) => { console.error(e); await closeDb(); process.exit(1); });
+})().catch(async (e) => {
+  const msg = e instanceof Error ? e.message : String(e);
+  let hint = "";
+  if (/Password must/.test(msg)) hint = "Fix: in Vercel → Settings → Environment Variables, set BOOTSTRAP_DIRECTOR_PASSWORD to at least 10 characters with letters AND numbers, then redeploy.";
+  else if (/ENOTFOUND|ECONNREFUSED|password authentication|does not exist|SSL|certificate|timeout/i.test(msg)) hint = "Fix: the database connection failed. Check the Neon database is connected to this project (Storage tab) and that DATABASE_URL exists in Environment Variables, then redeploy.";
+  console.error("\n================ ISSS SETUP FAILED ================");
+  console.error("Reason: " + msg);
+  if (hint) console.error(hint);
+  console.error("===================================================\n");
+  console.error(e);
+  await closeDb();
+  process.exit(1);
+});
