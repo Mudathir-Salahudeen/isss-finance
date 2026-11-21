@@ -6,6 +6,8 @@ import { listStudents } from "@/server/services/students";
 import { PageHeader, Alert } from "@/components/ui";
 import { PaymentForm } from "@/components/client/PaymentForm";
 import { todayISO } from "@/lib/dates";
+import Link from "next/link";
+import { can } from "@/server/actor";
 import { db } from "@/db";
 import { students } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -24,7 +26,9 @@ export default async function NewPayment({ searchParams }: { searchParams: Promi
   return (
     <>
       <PageHeader title="Record student payment" back={{ href: "/payments", label: "Payments" }} />
-      {!accounts.length ? <Alert tone="warn">No receiving accounts are available to you. Ask the Director to register an account or grant you access.</Alert> :
+      {!accounts.length ? (can(a, "accounts.manage")
+        ? <Alert tone="warn" title="Register the school's accounts first">Every payment must say which bank, cash or POS account received the money, and none have been set up yet. <Link className="link font-semibold" href="/accounts">Go to Bank &amp; cash accounts →</Link></Alert>
+        : <Alert tone="warn">No receiving accounts are available to you yet. Ask the Director to register the school&apos;s bank/cash accounts, or to give you access to one.</Alert>) :
         <PaymentForm channels={channels.filter((c) => c.active)} accounts={accounts} sessions={st.sessions} terms={st.terms} initialStudent={initial} today={todayISO()} />}
     </>
   );
