@@ -9,6 +9,7 @@ types.setTypeParser(20, (v) => {
   return n;
 });
 import * as schema from "./schema";
+import { pgConfig } from "./connection";
 
 export type DB = NodePgDatabase<typeof schema>;
 export type Tx = Parameters<Parameters<DB["transaction"]>[0]>[0];
@@ -21,7 +22,7 @@ function init(): DB {
     const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
     if (!url) throw new Error("DATABASE_URL is not set. Attach the database (see DEPLOY.md) and redeploy.");
     // Serverless (Vercel) runs many small instances: keep each pool tiny and use the provider's pooled URL.
-    g.__sfmsPool = new Pool({ connectionString: url, max: process.env.VERCEL ? 3 : 10, idleTimeoutMillis: 10_000 });
+    g.__sfmsPool = new Pool({ ...pgConfig(url), max: process.env.VERCEL ? 3 : 10, idleTimeoutMillis: 10_000 });
     g.__sfmsDb = drizzle(g.__sfmsPool, { schema });
   }
   return g.__sfmsDb;
